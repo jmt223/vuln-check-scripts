@@ -1,0 +1,153 @@
+﻿톰캣 취약점 점검 결과
+점검 날짜 : 2026-11-08 18:27:36
+호스트 이름 : localhost.localdomain (192.168.100.20)
+톰캣 경로 : /opt/tomcat
+
+===================== 1. 계정 관리 =====================
+
+[WEB-01] Default 관리자 계정명 변경
+  관리자 페이지 권한 있는 계정 없음 (관리자 페이지 안씀)
+결과 : 양호
+
+[WEB-02] 취약한 비밀번호 사용 제한
+  관리자 계정 없음
+결과 : 양호
+
+[WEB-03] 비밀번호 파일 권한 관리
+  /opt/tomcat/conf/tomcat-users.xml (소유자 root, 권한 600)
+결과 : 양호
+
+===================== 2. 서비스 관리 =====================
+
+[WEB-04] 웹 서비스 디렉터리 리스팅 방지 설정
+  /opt/tomcat/conf/web.xml : listings = false
+결과 : 양호
+
+[WEB-05] 지정하지 않은 CGI/ISAPI 실행 제한
+  CGI 안씀 (주석 처리 상태)
+결과 : 양호
+
+[WEB-06] 웹 서비스 상위 디렉터리 접근 제한 설정
+  allowLinking 설정 없음
+결과 : 양호
+
+[WEB-07] 웹 서비스 경로 내 불필요한 파일 제거
+  webapps 안 : ROOT ROOT.war docs examples host-manager manager 
+  남아있는 기본 파일 : webapps/docs webapps/examples webapps/host-manager webapps/manager BUILDING.txt RELEASE-NOTES RUNNING.txt CONTRIBUTING.md README.md
+결과 : 취약
+
+[WEB-08] 웹 서비스 파일 업로드 및 다운로드 용량 제한
+  Connector 8080 : maxPostSize = 설정 없음
+  앱 ROOT : spring.servlet.multipart.max-file-size=10MB
+결과 : 양호
+
+[WEB-09] 웹 서비스 프로세스 권한 제한
+  tomcat.service User : root
+  톰캣 실행 계정 : root (UID 0, PID 218861)
+결과 : 취약
+
+[WEB-10] 불필요한 프록시 설정 제한
+  Connector 에 프록시 설정 없음
+결과 : 양호
+
+[WEB-11] 웹 서비스 경로 설정
+  Host localhost : appBase = /opt/tomcat/webapps
+  분리 안된 경로 : /opt/tomcat/webapps
+결과 : 취약
+
+[WEB-12] 웹 서비스 링크 사용 금지
+  링크 없음, allowLinking 없음
+결과 : 양호
+
+[WEB-13] 웹 서비스 설정 파일 노출 제한
+  /opt/tomcat/webapps/ROOT/WEB-INF/classes/application.properties (소유자 root, 권한 640)
+  (WAR 안에 application 설정파일 있음)
+  /opt/tomcat/webapps/ROOT.war (소유자 root, 권한 644)
+결과 : 취약
+
+[WEB-14] 웹 서비스 경로 내 파일의 접근 통제
+  톰캣 폴더 : root 755  conf : 700  bin : 750  webapps : 750
+  다른사람 권한 있는 파일/폴더 13 개 (앞에 20개만)
+    /opt/tomcat/bin/catalina.sh (root 751)
+    /opt/tomcat/bin/ciphers.sh (root 751)
+    /opt/tomcat/bin/configtest.sh (root 751)
+    /opt/tomcat/bin/daemon.sh (root 751)
+    /opt/tomcat/bin/digest.sh (root 751)
+    /opt/tomcat/bin/makebase.sh (root 751)
+    /opt/tomcat/bin/migrate.sh (root 751)
+    /opt/tomcat/bin/setclasspath.sh (root 751)
+    /opt/tomcat/bin/shutdown.sh (root 751)
+    /opt/tomcat/bin/startup.sh (root 751)
+    /opt/tomcat/bin/tool-wrapper.sh (root 751)
+    /opt/tomcat/bin/version.sh (root 751)
+    /opt/tomcat/webapps/ROOT.war (root 644)
+결과 : 취약
+
+[WEB-15] 웹 서비스의 불필요한 스크립트 매핑 제거
+  매핑 : default / 
+  매핑 : jsp *.jsp *.jspx 
+  기본 매핑(default, jsp)만 있음
+결과 : 양호
+
+[WEB-16] 웹 서비스 헤더 정보 노출 제한
+  ErrorReportValve showServerInfo : false
+  없는 페이지 요청 응답 : HTTP/1.1 302 
+결과 : 양호
+
+[WEB-17] 가상 디렉터리 삭제
+  Context path 설정 없음
+결과 : 양호
+
+[WEB-18] 웹 서비스 WebDAV 비활성화
+  가이드에 톰캣 점검 방법이 없음 (Nginx 만 나와있음)
+결과 : N/A
+
+===================== 3. 보안 설정 =====================
+
+[WEB-19] 웹 서비스 SSI 사용 제한
+  SSI 안씀 (주석 처리 상태)
+결과 : 양호
+
+[WEB-20] SSL/TLS 활성화
+  가이드에 톰캣 점검 방법이 없음 (Nginx 만 나와있음)
+  (참고) SSL Connector : 0 개
+결과 : N/A
+
+[WEB-21] HTTP 리디렉션
+  가이드에 톰캣 점검 방법이 없음 (Nginx 만 나와있음)
+결과 : N/A
+
+[WEB-22] 에러 페이지 관리
+  (참고) ErrorReportValve showReport=false showServerInfo=false
+  앱 ROOT : web.xml error-page 는 없고 앱 에러 화면 있음 (/opt/tomcat/webapps/ROOT/WEB-INF/views/error.jsp)
+  톰캣이 직접 내는 에러(400 등)는 톰캣 기본 화면이 나옴 -> 이대로 괜찮은지 확인
+결과 : 인터뷰
+
+[WEB-23] LDAP 알고리즘 적절하게 구성
+  LDAP 연동 안함
+결과 : N/A
+
+[WEB-24] 별도의 업로드 경로 사용 및 권한 설정
+  앱 ROOT 업로드 경로 설정 : /opt/jmt223/uploads
+  /opt/jmt223/uploads (소유자 root, 권한 755)
+결과 : 취약
+
+===================== 4. 패치 및 로그 관리 =====================
+
+[WEB-25] 주기적 보안 패치 및 벤더 권고사항 적용
+  현재 버전 : Apache Tomcat/10.1.54
+  https://tomcat.apache.org 최신 버전이랑 비교 필요
+결과 : 인터뷰
+
+[WEB-26] 로그 디렉터리 및 파일 권한 설정
+  로그 폴더 : /opt/tomcat/logs 
+  로그 폴더/파일에 다른사람 권한 없음
+결과 : 양호
+
+======================================
+양호 : 14
+취약 : 6
+인터뷰 : 2
+N/A : 4
+취약 항목 : WEB-07 WEB-09 WEB-11 WEB-13 WEB-14 WEB-24 
+인터뷰 항목 : WEB-22 WEB-25 

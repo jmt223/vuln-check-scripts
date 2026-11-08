@@ -1,0 +1,365 @@
+﻿리눅스 취약점 점검 결과
+점검 날짜 : 2026-11-08 18:27:36
+호스트 이름 : localhost.localdomain (192.168.100.30)
+OS : Rocky Linux release 9.5 (Blue Onyx)
+
+===================== 1. 계정관리 =====================
+
+[U-01] root 계정 원격 접속 제한
+  ssh PermitRootLogin : without-password (no 여야 됨)
+결과 : 취약
+
+[U-02] 비밀번호 관리정책 설정
+  PASS_MAX_DAYS : 99999   PASS_MIN_DAYS : 0   minlen : 8
+  dcredit : 없음  ucredit : 없음  lcredit : 없음  ocredit : 없음   remember : 없음
+  기준 안맞는거 : PASS_MAX_DAYS PASS_MIN_DAYS dcredit ucredit lcredit ocredit remember
+결과 : 취약
+
+[U-03] 계정 잠금 임계값 설정
+  pam 에 faillock 이 없음 (authselect enable-feature with-faillock 해야 적용됨)
+결과 : 취약
+
+[U-04] 비밀번호 파일 보호
+  shadow 파일 사용중
+결과 : 양호
+
+[U-05] root 이외의 UID가 0 금지
+  root 말고 UID 0 인 계정 없음
+결과 : 양호
+
+[U-06] 사용자 계정 su 기능 제한
+  pam_wheel : 없음(주석처리)
+  /bin/su 권한 : 4755, 그룹 : root
+결과 : 취약
+
+[U-07] 불필요한 계정 제거
+  로그인 가능한 계정 :
+    root (마지막 로그인 : 일 11월 8 18:18:21 +0900 2026)
+    rocky (마지막 로그인 : 일 11월 8 18:18:21 +0900 2026)
+  기본으로 깔리는 계정 중 남아있는거 : lp operator games 
+결과 : 인터뷰
+
+[U-08] 관리자 그룹에 최소한의 계정 포함
+root:x:0:
+  root 그룹에 다른 계정 없음
+결과 : 양호
+
+[U-09] 계정이 존재하지 않는 GID 금지
+  계정 없는 일반 그룹 : 없음
+  group 파일에 없는 GID : 없음
+결과 : 양호
+
+[U-10] 동일한 UID 금지
+  중복 UID 없음
+결과 : 양호
+
+[U-11] 사용자 shell 점검
+  daemon : /sbin/nologin
+  bin : /sbin/nologin
+  adm : /sbin/nologin
+  nobody : /sbin/nologin
+  operator : /sbin/nologin
+  games : /sbin/nologin
+결과 : 양호
+
+[U-12] 세션 종료 시간 설정
+  TMOUT : 설정 없음
+결과 : 취약
+
+[U-13] 안전한 비밀번호 암호화 알고리즘 사용
+  ENCRYPT_METHOD : SHA512
+  약한 방식으로 저장된 계정 : 없음
+결과 : 양호
+
+===================== 2. 파일 및 디렉토리 관리 =====================
+
+[U-14] root 홈, 패스 디렉터리 권한 및 패스 설정
+  root PATH : /root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+결과 : 양호
+
+[U-15] 파일 및 디렉터리 소유자 설정
+  소유자 없는 파일 없음
+결과 : 양호
+
+[U-16] /etc/passwd 파일 소유자 및 권한 설정
+  /etc/passwd (소유자 root, 권한 644)
+결과 : 양호
+
+[U-17] 시스템 시작 스크립트 권한 설정
+  점검한 파일 2 개
+  전부 root 소유, 다른사람 쓰기 권한 없음
+결과 : 양호
+
+[U-18] /etc/shadow 파일 소유자 및 권한 설정
+  /etc/shadow (소유자 root, 권한 0)
+결과 : 양호
+
+[U-19] /etc/hosts 파일 소유자 및 권한 설정
+  /etc/hosts (소유자 root, 권한 644)
+결과 : 양호
+
+[U-20] /etc/(x)inetd.conf 파일 소유자 및 권한 설정
+  /etc/systemd 아래 600 넘는 파일 7 개
+    /etc/systemd/journald.conf (root 644)
+    /etc/systemd/logind.conf (root 644)
+    /etc/systemd/system.conf (root 644)
+    /etc/systemd/user.conf (root 644)
+    /etc/systemd/coredump.conf (root 644)
+    /etc/systemd/pstore.conf (root 644)
+    /etc/systemd/sleep.conf (root 644)
+결과 : 취약
+
+[U-21] /etc/(r)syslog.conf 파일 소유자 및 권한 설정
+  /etc/rsyslog.conf (소유자 root, 권한 644)
+결과 : 취약
+
+[U-22] /etc/services 파일 소유자 및 권한 설정
+  /etc/services (소유자 root, 권한 644)
+결과 : 양호
+
+[U-23] SUID, SGID, Sticky bit 설정 파일 점검
+  SUID/SGID 파일 16 개
+    -rwsr-xr-x root root /usr/bin/fusermount3
+    -rwsr-xr-x root root /usr/bin/mount
+    -rwsr-xr-x root root /usr/bin/umount
+    -rwsr-xr-x root root /usr/bin/chage
+    -rwsr-xr-x root root /usr/bin/gpasswd
+    -rwsr-xr-x root root /usr/bin/newgrp
+    -rwxr-sr-x root tty /usr/bin/write
+    -rwsr-xr-x root root /usr/bin/su
+    -rwsr-xr-x root root /usr/bin/passwd
+    -rwsr-xr-x root root /usr/bin/crontab
+    ---s--x--x root root /usr/bin/sudo
+    -rwsr-xr-x root root /usr/sbin/pam_timestamp_check
+    -rwsr-xr-x root root /usr/sbin/unix_chkpwd
+    -rwsr-xr-x root root /usr/sbin/grub2-set-bootflag
+    -rwx--s--x root utmp /usr/libexec/utempter/utempter
+    -r-xr-sr-x root ssh_keys /usr/libexec/openssh/ssh-keysign
+  가이드에 나온 주요 파일 중 있는거 : /usr/bin/newgrp /usr/sbin/unix_chkpwd 
+결과 : 인터뷰
+
+[U-24] 사용자, 시스템 환경변수 파일 소유자 및 권한 설정
+  점검한 환경변수 파일 7 개
+결과 : 양호
+
+[U-25] world writable 파일 점검
+  world writable 파일 없음
+결과 : 양호
+
+[U-26] /dev에 존재하지 않는 device 파일 점검
+  /dev 안에 일반 파일 없음
+결과 : 양호
+
+[U-27] $HOME/.rhosts, hosts.equiv 사용 금지
+  r 계열 서비스 안씀
+결과 : 양호
+
+[U-28] 접속 IP 및 포트 제한
+  zone public : 서비스 [cockpit ssh] 포트 [3306/tcp] 허용IP []
+  IP 제한 없이 열린거 : cockpit ssh 3306/tcp
+결과 : 취약
+
+[U-29] hosts.lpd 파일 소유자 및 권한 설정
+  hosts.lpd 파일 없음
+결과 : 양호
+
+[U-30] UMASK 설정 관리
+  login.defs UMASK : 022
+  profile/bashrc 에 적힌 umask : 022
+  root 로그인했을때 umask : 0022
+  rocky 로그인했을때 umask : 0022
+결과 : 양호
+
+[U-31] 홈 디렉토리 소유자 및 권한 설정
+  root : /root (소유자 root, 권한 550)
+  rocky : /home/rocky (소유자 rocky, 권한 700)
+결과 : 양호
+
+[U-32] 홈 디렉토리로 지정한 디렉토리의 존재 관리
+  홈 디렉토리 없는 계정 없음
+결과 : 양호
+
+[U-33] 숨김파일 찾기
+  숨김 파일/폴더 전체 17 개
+  기본 파일 말고 확인해볼거 :
+    /root/.cshrc
+    /root/.tcshrc
+    /root/.mysql_history
+    /root/.my.cnf
+결과 : 인터뷰
+
+===================== 3. 서비스 관리 =====================
+
+[U-34] Finger 서비스 비활성화
+  finger 서비스 없음
+결과 : 양호
+
+[U-35] 공유 서비스에 대한 익명 접근 제한 설정
+  FTP, 삼바, NFS 공유 서비스 안씀
+결과 : 양호
+
+[U-36] r 계열 서비스 비활성화
+  r 계열 서비스 없음
+결과 : 양호
+
+[U-37] crontab 설정파일 권한 설정 미흡
+  /usr/bin/crontab (소유자 root, 권한 4755)
+  /etc/crontab (소유자 root, 권한 644)
+  /etc/cron.deny (소유자 root, 권한 644)
+  /etc/cron.d/0hourly (소유자 root, 권한 644)
+결과 : 취약
+
+[U-38] DoS 공격에 취약한 서비스 비활성화
+  echo, discard, daytime, chargen 없음
+결과 : 양호
+
+[U-39] 불필요한 NFS 서비스 비활성화
+  NFS 서비스 없음
+결과 : 양호
+
+[U-40] NFS 접근 통제
+  NFS 공유 설정 없음
+결과 : N/A
+
+[U-41] 불필요한 automountd 제거
+  autofs 없음
+결과 : 양호
+
+[U-42] 불필요한 RPC 서비스 비활성화
+  RPC 서비스 없음
+결과 : 양호
+
+[U-43] NIS, NIS+ 점검
+  NIS 서비스 없음
+결과 : 양호
+
+[U-44] tftp, talk 서비스 비활성화
+  tftp, talk 없음
+결과 : 양호
+
+[U-45] 메일 서비스 버전 점검
+  메일 서비스 안씀
+결과 : 양호
+
+[U-46] 일반 사용자의 메일 서비스 실행 방지
+  메일 서비스 안씀
+결과 : N/A
+
+[U-47] 스팸 메일 릴레이 제한
+  메일 서비스 안씀
+결과 : N/A
+
+[U-48] expn, vrfy 명령어 제한
+  메일 서비스 안씀
+결과 : N/A
+
+[U-49] DNS 보안 버전 패치
+  DNS 서비스 안씀
+결과 : N/A
+
+[U-50] DNS Zone Transfer 설정
+  DNS 서비스 안씀
+결과 : N/A
+
+[U-51] DNS 서비스의 취약한 동적 업데이트 설정 금지
+  DNS 서비스 안씀
+결과 : N/A
+
+[U-52] Telnet 서비스 비활성화
+  telnet 없음
+결과 : 양호
+
+[U-53] FTP 서비스 정보 노출 제한
+  FTP 서비스 안씀
+결과 : N/A
+
+[U-54] 암호화되지 않는 FTP 서비스 비활성화
+  FTP 서비스 안씀
+결과 : 양호
+
+[U-55] FTP 계정 shell 제한
+  ftp 쉘 : /sbin/nologin
+결과 : 양호
+
+[U-56] FTP 서비스 접근 제어 설정
+  FTP 서비스 안씀
+결과 : N/A
+
+[U-57] Ftpusers 파일 설정
+  FTP 서비스 안씀
+결과 : N/A
+
+[U-58] 불필요한 SNMP 서비스 구동 점검
+  SNMP 사용 안함
+결과 : 양호
+
+[U-59] 안전한 SNMP 버전 사용
+  SNMP 사용 안함
+결과 : N/A
+
+[U-60] SNMP Community String 복잡성 설정
+  SNMP 사용 안함
+결과 : N/A
+
+[U-61] SNMP Access Control 설정
+  SNMP 사용 안함
+결과 : N/A
+
+[U-62] 로그인 시 경고 메시지 설정
+  /etc/motd : 비어있음
+  ssh Banner : none
+결과 : 취약
+
+[U-63] sudo 명령어 접근 관리
+  /etc/sudoers (소유자 root, 권한 440)
+결과 : 양호
+
+===================== 4. 패치 관리 =====================
+
+[U-64] 주기적 보안 패치 및 벤더 권고사항 적용
+  OS : Rocky Linux release 9.5 (Blue Onyx)
+  실행중인 커널 : 5.14.0-503.14.1.el9_5.x86_64
+  설치된 커널 중 최신 : kernel-5.14.0-503.14.1.el9_5.x86_64
+  최근에 설치/업데이트한 패키지 :
+    python3-policycoreutils-3.6-3.el9.noarch      2026년 05월 08일 (금) 오전 01시 25분 18초
+    policycoreutils-python-utils-3.6-3.el9.noarch 2026년 05월 08일 (금) 오전 01시 25분 18초
+    audit-3.1.5-7.el9.x86_64                      2026년 05월 08일 (금) 오전 01시 25분 18초
+    python3-setuptools-53.0.0-15.el9.noarch       2026년 05월 08일 (금) 오전 01시 25분 17초
+    python3-setools-4.4.4-1.el9.x86_64            2026년 05월 08일 (금) 오전 01시 25분 17초
+결과 : 인터뷰
+
+===================== 5. 로그 관리 =====================
+
+[U-65] NTP 및 시각 동기화 설정
+  chronyd 실행중
+  pool 2.rocky.pool.ntp.org iburst
+결과 : 양호
+
+[U-66] 정책에 따른 시스템 로깅 설정
+  *.info;mail.none;authpriv.none;cron.none                /var/log/messages
+  authpriv.*                                              /var/log/secure
+  mail.*                                                  -/var/log/maillog
+  cron.*                                                  /var/log/cron
+  *.emerg                                                 :omusrmsg:*
+  uucp,news.crit                                          /var/log/spooler
+  local7.*                                                /var/log/boot.log
+  기본 로그 설정 있음 -> 정책에 맞는지 확인
+결과 : 인터뷰
+
+[U-67] 로그 디렉터리 소유자 및 권한 설정
+  점검한 로그 파일 69 개
+  기준 넘는 파일 5 개
+    /var/log/wtmp (root 664)
+    /var/log/lastlog (root 664)
+    /var/log/mysqld.log (mysql 640)
+    /var/log/btmp-20261101 (root 660)
+    /var/log/btmp (root 660)
+결과 : 취약
+
+======================================
+양호 : 38
+취약 : 11
+인터뷰 : 5
+N/A : 13
+취약 항목 : U-01 U-02 U-03 U-06 U-12 U-20 U-21 U-28 U-37 U-62 U-67 
+인터뷰 항목 : U-07 U-23 U-33 U-64 U-66 

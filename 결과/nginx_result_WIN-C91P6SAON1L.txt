@@ -1,0 +1,134 @@
+﻿nginx 취약점 점검 결과
+점검 날짜 : 2026-11-08 01:17:04
+컴퓨터 이름 : WIN-C91P6SAON1L
+nginx 경로 : C:\nginx
+nginx 버전 : nginx version: nginx/1.30.0
+설정 : nginx -T 로 읽음 (include 포함), server 블록 1 개
+
+===================== 1. 계정 관리 =====================
+
+[WEB-01] Default 관리자 계정명 변경
+  가이드에 nginx 점검 방법이 없음 (nginx 는 관리자 페이지/계정이 없음)
+결과 : N/A
+
+[WEB-02] 취약한 비밀번호 사용 제한
+  가이드에 nginx 점검 방법이 없음
+결과 : N/A
+
+[WEB-03] 비밀번호 파일 권한 관리
+  가이드에 nginx 점검 방법이 없음
+결과 : N/A
+
+===================== 2. 서비스 관리 =====================
+
+[WEB-04] 웹 서비스 디렉터리 리스팅 방지 설정
+  autoindex on 없음 (기본값 off)
+결과 : 양호
+
+[WEB-05] 지정하지 않은 CGI/ISAPI 실행 제한
+  CGI 연동 설정 없음
+결과 : 양호
+
+[WEB-06] 웹 서비스 상위 디렉터리 접근 제한 설정
+  auth_basic 설정 없음 -> 접근 제한이 필요한 디렉터리가 있는지 확인
+결과 : 인터뷰
+
+[WEB-07] 웹 서비스 경로 내 불필요한 파일 제거
+  남아있는 기본 파일 : html\index.html, html\50x.html, docs, contrib
+결과 : 취약
+
+[WEB-08] 웹 서비스 파일 업로드 및 다운로드 용량 제한
+  client_max_body_size 설정 없음
+결과 : 취약
+
+[WEB-09] 웹 서비스 프로세스 권한 제한
+  nginx 지금 안 돌고 있음 -> 서비스/예약 작업 설정에서 실행 계정 찾음
+  실행 계정 : SYSTEM (예약 작업 nginx)
+  관리자 권한으로 구동
+결과 : 취약
+
+[WEB-10] 불필요한 프록시 설정 제한
+  proxy_pass http://192.168.100.20:8080 : http > server > location /
+  필요한 프록시인지 확인
+결과 : 인터뷰
+
+[WEB-11] 웹 서비스 경로 설정
+  root 없이 프록시만 사용 (정적 웹 경로 안씀)
+결과 : N/A
+
+[WEB-12] 웹 서비스 링크 사용 금지
+  웹 경로 안에 링크 없음 (C:\nginx\html)
+결과 : 양호
+
+[WEB-13] 웹 서비스 설정 파일 노출 제한
+  가이드에 nginx 점검 방법이 없음
+결과 : N/A
+
+[WEB-14] 웹 서비스 경로 내 파일의 접근 통제
+  C:\nginx : BUILTIN\Users (ReadAndExecute, Synchronize), BUILTIN\Users (AppendData), BUILTIN\Users (CreateFiles)
+  C:\nginx\conf : BUILTIN\Users (ReadAndExecute, Synchronize), BUILTIN\Users (AppendData), BUILTIN\Users (CreateFiles)
+  C:\nginx\html : BUILTIN\Users (ReadAndExecute, Synchronize), BUILTIN\Users (AppendData), BUILTIN\Users (CreateFiles)
+결과 : 취약
+
+[WEB-15] 웹 서비스의 불필요한 스크립트 매핑 제거
+  가이드에 nginx 점검 방법이 없음
+결과 : N/A
+
+[WEB-16] 웹 서비스 헤더 정보 노출 제한
+  server_tokens off 없음 (기본값은 버전 노출)
+  버전 노출되는 server : localhost (server #1)
+결과 : 취약
+
+[WEB-17] 가상 디렉터리
+  alias 없음
+결과 : 양호
+
+[WEB-18] 웹 서비스 WebDAV 비활성화
+  WebDAV(dav_methods) 설정 없음
+결과 : 양호
+
+===================== 3. 보안 설정 =====================
+
+[WEB-19] 웹 서비스 SSI 사용 제한
+  ssi on 없음 (기본값 off)
+결과 : 양호
+
+[WEB-20] SSL/TLS 활성화
+  SSL/TLS 쓰는 server 없음 (listen 에 ssl 없음)
+결과 : 취약
+
+[WEB-21] HTTP 리디렉션
+  HTTP server localhost (server #1) : HTTPS 리디렉션 없음
+결과 : 취약
+
+[WEB-22] 에러 페이지 관리
+  error_page 없는 server : localhost (server #1)
+결과 : 취약
+
+[WEB-23] LDAP 알고리즘 적절하게 구성
+  가이드에 nginx 점검 방법이 없음
+결과 : N/A
+
+[WEB-24] 별도의 업로드 경로 사용 및 권한 설정
+  프록시로 넘기고 있어서 업로드는 뒤쪽 서버(WAS)에서 처리 -> WAS 점검 결과도 같이 확인
+  업로드 경로를 웹 경로 밖에 따로 쓰는지 담당자 확인
+결과 : 인터뷰
+
+===================== 4. 패치 및 로그 관리 =====================
+
+[WEB-25] 주기적 보안 패치 및 벤더 권고사항 적용
+  현재 버전 : nginx version: nginx/1.30.0
+  https://nginx.org/en/download.html 최신 버전이랑 비교 필요
+결과 : 인터뷰
+
+[WEB-26] 로그 디렉터리 및 파일 권한 설정
+  C:\nginx\logs : BUILTIN\Users (ReadAndExecute, Synchronize), BUILTIN\Users (AppendData), BUILTIN\Users (CreateFiles)
+결과 : 취약
+
+======================================
+양호 : 6
+취약 : 9
+인터뷰 : 4
+N/A : 7
+취약 항목 : WEB-07 WEB-08 WEB-09 WEB-14 WEB-16 WEB-20 WEB-21 WEB-22 WEB-26
+인터뷰 항목 : WEB-06 WEB-10 WEB-24 WEB-25
